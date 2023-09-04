@@ -1,4 +1,6 @@
 import {Controller} from "@hotwired/stimulus";
+import {useClickOutside} from "stimulus-use";
+import {useDebounce} from "stimulus-use";
 
 export default class extends Controller{
     static values = {
@@ -8,12 +10,27 @@ export default class extends Controller{
         'result'
     ];
 
-    async onSearchInput(event){
+    static debounces = ['search']
+
+    connect() {
+        useClickOutside(this);
+        useDebounce(this);
+    }
+
+    onSearchInput(event) {
+        this.search([event.currentTarget.value])
+    }
+
+    async search(query){
         const params = new URLSearchParams({
-            q: event.currentTarget.value,
+            q: query,
             preview: 1
         })
         const response = await fetch(`${this.urlValue}?${params.toString()}`);
         this.resultTarget.innerHTML = await response.text();
+    }
+
+    clickOutside(event){
+        this.resultTarget.innerHTML = '';
     }
 }
