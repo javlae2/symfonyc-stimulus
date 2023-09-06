@@ -13,7 +13,6 @@ export default class extends Controller{
 
     setNewData() {
         const newNumber = Math.floor(Math.random() * 50) + 1;
-        console.log(newNumber);
         this.chart.data.datasets[0].data[Math.floor(Math.random() * (this.chart.data.datasets[0].data.length))] = newNumber;
         this.chart.update();
     }
