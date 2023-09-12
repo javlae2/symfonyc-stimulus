@@ -15,9 +15,10 @@ use Symfony\Component\Routing\Annotation\Route;
 class ProductAdminController extends AbstractController
 {
     #[Route('/', name: 'app_product_admin_index', methods: ['GET'])]
-    public function index(ProductRepository $productRepository): Response
+    public function index(ProductRepository $productRepository, Request $request): Response
     {
-        return $this->render('product_admin/index.html.twig', [
+        $template = $request->query->get('ajax') ? 'product_admin/_list.html.twig' : 'product_admin/index.html.twig';
+        return $this->render($template, [
             'products' => $productRepository->findBy([], ['id'=>'DESC']),
         ]);
     }
@@ -32,6 +33,10 @@ class ProductAdminController extends AbstractController
         if ($form->isSubmitted() && $form->isValid()) {
             $entityManager->persist($product);
             $entityManager->flush();
+
+            if($request->isXmlHttpRequest()){
+                return new Response(null, 204);
+            }
 
             return $this->redirectToRoute('app_product_admin_index', [], Response::HTTP_SEE_OTHER);
         }
